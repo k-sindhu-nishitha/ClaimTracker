@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% block title %}Something went wrong - ClaimTrackr{% endblock %}
+{% block body %}
+<main class="container" style="padding-top:60px;max-width:640px">
+  <section class="card" style="text-align:center">
+    <div style="font-size:44px">⚠️</div>
+    <h2 style="font-size:22px;margin-top:8px">We couldn’t process that</h2>
+    <p class="sub" style="font-size:15px">{{ message }}</p>
+    <a class="btn btn-primary" href="/">← Back to the form</a>
+  </section>
+</main>
+{% endblock %}

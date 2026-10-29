@@ -1,0 +1,84 @@
+{% extends "_base.html" %}
+{% block title %}{{ r.verdict.replace('_', ' ').title() }} - ClaimTrackr{% endblock %}
+{% block body %}
+{% set V = {'APPROVED': {'cls': 'ok', 'icon': '✓', 'label': 'Approved'},
+            'REJECTED': {'cls': 'bad', 'icon': '✕', 'label': 'Rejected'},
+            'NEEDS_REVIEW': {'cls': 'warn', 'icon': '!', 'label': 'Needs human review'}}[r.verdict] %}
+{% set DOT = {'pass': '✓', 'fail': '✕', 'warn': '!', 'info': 'i'} %}
+<main class="container" style="padding-top:34px">
+  <section class="verdict {{ V.cls }}">
+    <div class="badge"><i>{{ V.icon }}</i></div>
+    <div>
+      <div class="label">Decision{% if claim_id %} · claim #{{ claim_id }}{% endif %}</div>
+      <h1>{{ V.label }}</h1>
+      <p>{{ r.summary }}</p>
+    </div>
+    {% if r.approved_amount %}<div class="amount"><small>Approved amount</small><strong>{{ r.approved_amount|money }}</strong></div>{% endif %}
+  </section>
+
+  {% if 'offline' in r.backend %}
+  <div class="notice"><span>ⓘ</span><span>Offline demo mode: the report below is generated from a template, not by an LLM. Retrieval, rules and guardrails are real.</span></div>
+  {% endif %}
+
+  <section class="stats">
+    <div class="stat"><small>Claimed</small><b>{{ claim.total_claim_amount|money }}</b></div>
+    <div class="stat"><small>Billed</small><b>{{ r.bill.expense|money }}</b></div>
+    <div class="stat"><small>Diagnosis</small><b style="font-size:16px">{{ r.bill.disease or '-' }}</b></div>
+    <div class="stat"><small>Processed in</small><b>{{ r.latency_ms }} ms</b></div>
+  </section>
+
+  <div class="layout" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);padding-bottom:0">
+    <section class="card">
+      <h2>How the decision was made</h2>
+      <p class="sub">Each check, in order.</p>
+      <ol class="timeline">
+        {% for s in r.steps %}
+        <li><div class="dot {{ s.status }}">{{ DOT[s.status] }}</div><div><b>{{ s.name }}</b><span>{{ s.detail }}</span></div></li>
+        {% endfor %}
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>Claim details</h2>
+      <p class="sub">As submitted.</p>
+      <dl class="kv">
+        <div><dt>Claimant</dt><dd>{{ claim.name }}</dd></div>
+        <div><dt>Patient on bill</dt><dd>{{ r.bill.patient_name or '-' }}</dd></div>
+        <div><dt>Claim type</dt><dd>{{ claim.claim_type or '-' }}</dd></div>
+        <div><dt>Reason</dt><dd>{{ claim.claim_reason or '-' }}</dd></div>
+        <div><dt>Facility</dt><dd>{{ claim.medical_facility or '-' }}</dd></div>
+        <div><dt>Date</dt><dd>{{ claim.date or '-' }}</dd></div>
+        <div><dt>Address</dt><dd>{{ claim.address or '-' }}</dd></div>
+        <div><dt>Description</dt><dd>{{ claim.description or '-' }}</dd></div>
+        <div><dt>Engine</dt><dd>{{ r.backend }}</dd></div>
+      </dl>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:24px">
+    <h2>Claim report</h2>
+    <p class="sub">Written from the handbook excerpts below.</p>
+    <div class="report">{{ r.report }}</div>
+  </section>
+
+  <section class="card" style="margin-top:24px">
+    <h2>Handbook excerpts used <span class="pill brand">RAG</span></h2>
+    <p class="sub">Found by FAISS similarity search. The model was only allowed to use these passages.</p>
+    {% set top = (r.sources[0].score if r.sources else 1) or 1 %}
+    {% for s in r.sources %}
+    <details class="src">
+      <summary><b>{{ s.source }}</b> · page {{ s.page }}
+        <span class="meta"><span>{{ s.query }}</span>
+          <span class="bar"><i style="width: {{ (s.score / top * 100)|round|int }}%"></i></span><span>{{ s.score }}</span></span></summary>
+      <div class="body">{{ s.text }}</div>
+    </details>
+    {% else %}<p class="hint">No excerpts were retrieved.</p>{% endfor %}
+  </section>
+
+  <div class="actions-bar">
+    <a class="btn btn-primary" href="/">Submit another claim</a>
+    <a class="btn btn-ghost" href="/history">View history</a>
+    <button class="btn btn-ghost" type="button" onclick="window.print()">Print report</button>
+  </div>
+</main>
+{% endblock %}

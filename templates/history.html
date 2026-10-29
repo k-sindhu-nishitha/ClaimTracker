@@ -1,0 +1,37 @@
+{% extends "_base.html" %}
+{% block title %}History - ClaimTrackr{% endblock %}
+{% block body %}
+<main class="container" style="padding-top:34px">
+  <h1 style="margin:0 0 6px;letter-spacing:-.02em">Claim history</h1>
+  <p class="hint" style="margin:0 0 22px;font-size:14px">Every decision is saved, so the process can be audited.</p>
+
+  <section class="stats">
+    <div class="stat"><small>Total</small><b>{{ rows|length }}</b></div>
+    <div class="stat"><small>Approved</small><b style="color:var(--ok)">{{ stats.get('APPROVED', 0) }}</b></div>
+    <div class="stat"><small>Rejected</small><b style="color:var(--bad)">{{ stats.get('REJECTED', 0) }}</b></div>
+    <div class="stat"><small>Needs review</small><b style="color:var(--warn)">{{ stats.get('NEEDS_REVIEW', 0) }}</b></div>
+  </section>
+
+  <section class="card" style="padding:8px">
+    {% if rows %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>When (UTC)</th><th>Claimant</th><th>Diagnosis</th><th>Amount</th><th>Verdict</th></tr></thead>
+      <tbody>
+      {% for row in rows %}
+        {% set cls = {'APPROVED': 'ok', 'REJECTED': 'bad', 'NEEDS_REVIEW': 'warn'}[row.verdict] %}
+        <tr>
+          <td><a href="/claims/{{ row.id }}">#{{ row.id }}</a></td>
+          <td>{{ row.created_at.replace('T', ' ')[:16] }}</td>
+          <td>{{ row.claimant }}</td>
+          <td>{{ row.diagnosis or '-' }}</td>
+          <td>{{ row.claim_amount|money }}</td>
+          <td><span class="pill {{ cls }}">{{ row.verdict.replace('_', ' ') }}</span></td>
+        </tr>
+      {% endfor %}
+      </tbody></table></div>
+    {% else %}
+    <div class="empty"><div class="big">🗂️</div><p>No claims yet.</p><a class="btn btn-primary" href="/">Submit your first claim</a></div>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

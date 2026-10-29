@@ -1,0 +1,94 @@
+{% extends "_base.html" %}
+{% block body %}
+<div id="overlay" class="overlay"><div class="box"><div class="spinner"></div>
+  <b>Analysing your claim…</b>
+  <p class="hint" style="margin:6px 0 0">Reading the bill, checking the rules and searching the policy handbook.</p></div></div>
+
+<section class="hero container">
+  <span class="eyebrow">● AI-powered claims processing</span>
+  <h1>Verify medical insurance claims <span>in seconds</span></h1>
+  <p>Upload a claim and its medical bill. ClaimTrackr reads the bill, checks the numbers, searches the policy handbook
+     and explains its decision, citing the pages it used.</p>
+</section>
+
+<main class="container layout">
+  <form id="claim-form" class="card" method="post" action="/" enctype="multipart/form-data">
+    <h2>New claim</h2>
+    <p class="sub">Fields marked <span style="color:var(--bad)">*</span> are required.</p>
+
+    <div class="section-title">Claimant</div>
+    <div class="row">
+      <div class="field"><label for="name">Full name <span class="req">*</span></label>
+        <input id="name" name="name" type="text" required autocomplete="name" placeholder="As written on the bill"></div>
+      <div class="field"><label for="date">Date of treatment</label>
+        <input id="date" name="date" type="date" value="{{ today }}"></div>
+    </div>
+    <div class="field"><label for="address">Address</label>
+      <input id="address" name="address" type="text" autocomplete="street-address" placeholder="Street, city"></div>
+
+    <div class="section-title">Claim</div>
+    <div class="row">
+      <div class="field"><label for="claim_type">Claim type</label>
+        <select id="claim_type" name="claim_type">
+          {% for t in claim_types %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+        </select></div>
+      <div class="field"><label for="total_claim_amount">Claim amount <span class="req">*</span></label>
+        <input id="total_claim_amount" name="total_claim_amount" type="number" min="1" step="any" required placeholder="e.g. 2500"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="claim_reason">Reason for claim</label>
+        <input id="claim_reason" name="claim_reason" type="text" placeholder="e.g. Viral fever"></div>
+      <div class="field"><label for="medical_facility">Medical facility</label>
+        <input id="medical_facility" name="medical_facility" type="text" placeholder="Hospital or clinic name"></div>
+    </div>
+    <div class="field"><label for="description">Description</label>
+      <textarea id="description" name="description" placeholder="Anything the reviewer should know"></textarea></div>
+
+    <div class="section-title">Medical bill</div>
+    <label id="dropzone" class="dropzone" for="medical_bill">
+      <span class="dz-icon">📄</span>
+      <strong id="dz-label">Click to choose a PDF, or drag it here</strong>
+      <span class="hint">Text-based PDF, up to 10 MB. Scanned images are not supported yet.</span>
+      <input id="medical_bill" name="medical_bill" type="file" accept="application/pdf,.pdf" required>
+    </label>
+
+    <button class="btn btn-primary btn-block" type="submit" style="margin-top:22px">Verify claim →</button>
+  </form>
+
+  <aside class="stack">
+    <section class="card">
+      <h2>How it works</h2>
+      <p class="sub">Every claim goes through the same pipeline.</p>
+      <ol class="steps">
+        <li><div><b>Read the bill</b><span>An LLM extracts the patient, diagnosis and amount.</span></div></li>
+        <li><div><b>Check the rules</b><span>Amount, name match and the policy’s exclusion list.</span></div></li>
+        <li><div><b>Search the handbook</b><span>FAISS finds the most relevant policy pages (RAG).</span></div></li>
+        <li><div><b>Decide and explain</b><span>Guardrails give a verdict and a cited report.</span></div></li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <h2>Try a sample</h2>
+      <p class="sub">Download a bill, then press “Fill form”.</p>
+      <div class="samples">
+        {% for s in samples %}
+        <div class="sample">
+          <div><b>{{ s.title }}</b><span class="pill {{ s.tone }}">{{ s.tag }}</span></div>
+          <div class="actions">
+            <a class="btn btn-ghost btn-sm" href="/samples/{{ s.file }}" download>PDF</a>
+            <button type="button" class="btn btn-ghost btn-sm" data-fill='{{ s.fill|tojson }}'>Fill form</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Engine</h2>
+      <p class="sub" style="margin-bottom:10px">What is running behind this page.</p>
+      <p style="margin:0;font-size:14px"><b>LLM:</b> {{ engine }}<br><b>Embeddings:</b> {{ embeddings }}<br><b>Indexed chunks:</b> {{ chunks }}</p>
+      {% if 'offline' in engine %}<div class="notice" style="margin:14px 0 0">Demo mode: no API key found, so reports are templated. Add OPENAI_API_KEY to use a real LLM.</div>{% endif %}
+    </section>
+  </aside>
+</main>
+{% endblock %}

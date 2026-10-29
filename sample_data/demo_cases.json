@@ -1,0 +1,74 @@
+[
+  {
+    "label": "Valid claim (viral fever)",
+    "bill": "sample_bills/Test_Bill_ViralFever.pdf",
+    "expected": "APPROVED",
+    "claim": {
+      "name": "Anita Rao",
+      "claim_type": "General Practitioner",
+      "claim_reason": "Viral fever",
+      "total_claim_amount": 2500,
+      "medical_facility": "City Care Hospital"
+    }
+  },
+  {
+    "label": "Valid claim (bodyache)",
+    "bill": "sample_bills/Bodyache.pdf",
+    "expected": "APPROVED",
+    "claim": {
+      "name": "Surbhit",
+      "claim_type": "General Practitoner",
+      "claim_reason": "Fever and body ache",
+      "total_claim_amount": 3000,
+      "medical_facility": "Apollo Hospitals"
+    }
+  },
+  {
+    "label": "HIV is a general exclusion",
+    "bill": "sample_bills/HIV.pdf",
+    "expected": "REJECTED",
+    "claim": {
+      "name": "Surbhit",
+      "claim_type": "Specialist",
+      "claim_reason": "Medication",
+      "total_claim_amount": 3000,
+      "medical_facility": "Apollo Hospitals"
+    }
+  },
+  {
+    "label": "Alzheimer's is a general exclusion",
+    "bill": "sample_bills/Alzheimer.pdf",
+    "expected": "REJECTED",
+    "claim": {
+      "name": "Surbhit",
+      "claim_type": "Specialist",
+      "claim_reason": "Medication",
+      "total_claim_amount": 3000,
+      "medical_facility": "Apollo Hospitals"
+    }
+  },
+  {
+    "label": "Claimed more than billed",
+    "bill": "sample_bills/Bodyache.pdf",
+    "expected": "REJECTED",
+    "claim": {
+      "name": "Surbhit",
+      "claim_type": "General Practitoner",
+      "claim_reason": "Fever and body ache",
+      "total_claim_amount": 9000,
+      "medical_facility": "Apollo Hospitals"
+    }
+  },
+  {
+    "label": "Name does not match bill",
+    "bill": "sample_bills/Bodyache.pdf",
+    "expected": "REJECTED",
+    "claim": {
+      "name": "Rahul Sharma",
+      "claim_type": "General Practitoner",
+      "claim_reason": "Fever and body ache",
+      "total_claim_amount": 3000,
+      "medical_facility": "Apollo Hospitals"
+    }
+  }
+]

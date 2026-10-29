@@ -1,0 +1,11 @@
+venv/
+.venv/
+claimenv/
+__pycache__/
+*.pyc
+.env
+config.yaml
+storage/
+faiss_index/
+.pytest_cache/
+.DS_Store
